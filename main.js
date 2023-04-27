@@ -27,7 +27,7 @@
       const leftEyeDistance = calculateEyeDistance(leftEye);
       const rightEyeDistance = calculateEyeDistance(rightEye);
 
-      const winkThreshold = 2;
+      const winkThreshold = 2.5;
       if (leftEyeDistance / rightEyeDistance >= winkThreshold || rightEyeDistance / leftEyeDistance >= winkThreshold) {
         winkDetected = true;
         break;
