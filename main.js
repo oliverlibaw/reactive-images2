@@ -1,4 +1,3 @@
-import * as faceapi from 'https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js';
 
 (async () => {
   const winkDetectedImage = document.getElementById("wink-detected");
