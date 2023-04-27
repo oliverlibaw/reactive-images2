@@ -1,5 +1,4 @@
-import * as tf from '@tensorflow/tfjs';
-import * as facemesh from '@tensorflow-models/face-landmarks-detection';
+import * as faceapi from 'https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js';
 
 (async () => {
   const winkDetectedImage = document.getElementById("wink-detected");
@@ -10,22 +9,23 @@ import * as facemesh from '@tensorflow-models/face-landmarks-detection';
   video.setAttribute("playsinline", "");
   document.body.appendChild(video);
 
-  const model = await facemesh.load(facemesh.SupportedPackages.mediapipeFacemesh);
+  await faceapi.nets.tinyFaceDetector.loadFromUri("/reactive-images/models");
+  await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/reactive-images/models");
 
   function calculateEyeDistance(eyePoints) {
     const upperLid = eyePoints[1];
     const lowerLid = eyePoints[4];
-    return Math.hypot(upperLid[0] - lowerLid[0], upperLid[1] - lowerLid[1]);
+    return Math.hypot(upperLid._x - lowerLid._x, upperLid._y - lowerLid._y);
   }
 
   async function detectWink() {
-    const predictions = await model.estimateFaces({input: video});
+    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
     let winkDetected = false;
 
-    for (const prediction of predictions) {
-      const leftEye = prediction.annotations.leftEyeIris;
-      const rightEye = prediction.annotations.rightEyeIris;
+    for (const detection of detections) {
+      const leftEye = detection.landmarks.getLeftEye();
+      const rightEye = detection.landmarks.getRightEye();
       const leftEyeDistance = calculateEyeDistance(leftEye);
       const rightEyeDistance = calculateEyeDistance(rightEye);
 
@@ -78,4 +78,4 @@ import * as facemesh from '@tensorflow-models/face-landmarks-detection';
 
   await setupCamera();
 })();
-``
+
