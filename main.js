@@ -28,7 +28,7 @@ for (const detection of detections) {
   const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
   const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
 
-  const winkThreshold = 0.5; // Change this value to adjust the sensitivity
+  const winkThreshold = 0.2; // Change this value to adjust the sensitivity
   if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
     winkDetected = true;
     break;
