@@ -31,7 +31,7 @@ async function detectWink() {
       const leftEyeAspectRatio = leftEyeDistance / (leftEye[0]._x - leftEye[3]._x);
       const rightEyeAspectRatio = rightEyeDistance / (rightEye[0]._x - rightEye[3]._x);
 
-      const winkThreshold = 0.2;
+      const winkThreshold = 0.05;
       if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
         winkDetected = true;
         break;
