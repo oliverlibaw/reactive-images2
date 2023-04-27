@@ -17,23 +17,26 @@ function calculateEyeAspectRatio(eyePoints) {
   return (A + B) / (2 * C);
 }
 
-  async function detectWink() {
+async function detectWink() {
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
     let winkDetected = false;
 
-for (const detection of detections) {
-  const leftEye = detection.landmarks.getLeftEye();
-  const rightEye = detection.landmarks.getRightEye();
-  const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
-  const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
+    for (const detection of detections) {
+      const leftEye = detection.landmarks.getLeftEye();
+      const rightEye = detection.landmarks.getRightEye();
+      const leftEyeDistance = calculateEyeDistance(leftEye);
+      const rightEyeDistance = calculateEyeDistance(rightEye);
+      
+      const leftEyeAspectRatio = leftEyeDistance / (leftEye[0]._x - leftEye[3]._x);
+      const rightEyeAspectRatio = rightEyeDistance / (rightEye[0]._x - rightEye[3]._x);
 
-  const winkThreshold = 0.2; // Change this value to adjust the sensitivity
-  if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
-    winkDetected = true;
-    break;
-  }
-}
+      const winkThreshold = 0.2;
+      if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
+        winkDetected = true;
+        break;
+      }
+    }
 
     if (winkDetected) {
       winkDetectedImage.hidden = false;
@@ -45,6 +48,7 @@ for (const detection of detections) {
 
     requestAnimationFrame(detectWink);
   }
+
 
   async function setupCamera() {
     try {
