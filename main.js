@@ -10,29 +10,30 @@
   await faceapi.nets.tinyFaceDetector.loadFromUri("/reactive-images/models");
   await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/reactive-images/models");
 
-  function calculateEyeDistance(eyePoints) {
-    const upperLid = eyePoints[1];
-    const lowerLid = eyePoints[4];
-    return Math.hypot(upperLid._x - lowerLid._x, upperLid._y - lowerLid._y);
-  }
+function calculateEyeAspectRatio(eyePoints) {
+  const A = faceapi.euclideanDistance(eyePoints[1], eyePoints[5]);
+  const B = faceapi.euclideanDistance(eyePoints[2], eyePoints[4]);
+  const C = faceapi.euclideanDistance(eyePoints[0], eyePoints[3]);
+  return (A + B) / (2 * C);
+}
 
   async function detectWink() {
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
     let winkDetected = false;
 
-    for (const detection of detections) {
-      const leftEye = detection.landmarks.getLeftEye();
-      const rightEye = detection.landmarks.getRightEye();
-      const leftEyeDistance = calculateEyeDistance(leftEye);
-      const rightEyeDistance = calculateEyeDistance(rightEye);
+for (const detection of detections) {
+  const leftEye = detection.landmarks.getLeftEye();
+  const rightEye = detection.landmarks.getRightEye();
+  const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
+  const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
 
-      const winkThreshold = 2.5;
-      if (leftEyeDistance / rightEyeDistance >= winkThreshold || rightEyeDistance / leftEyeDistance >= winkThreshold) {
-        winkDetected = true;
-        break;
-      }
-    }
+  const winkThreshold = 0.5; // Change this value to adjust the sensitivity
+  if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
+    winkDetected = true;
+    break;
+  }
+}
 
     if (winkDetected) {
       winkDetectedImage.hidden = false;
