@@ -1,4 +1,3 @@
-
 (async () => {
   const winkDetectedImage = document.getElementById("wink-detected");
   const winkNotDetectedImage = document.getElementById("wink-not-detected");
@@ -77,4 +76,3 @@
 
   await setupCamera();
 })();
-
