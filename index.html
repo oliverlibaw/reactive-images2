@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wink Detection</title>
-    <script defer src="https://unpkg.com/mediapipe@0.3.162014726"></script>
-
-    <script defer src="https://unpkg.com/@tensorflow/tfjs@1.7.4"></script>
-    <script defer src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <script defer src="main.js" type="module"></script>
-</head>
-<body>
-    <img id="wink-detected" src="look.jpg" alt="Wink detected" hidden>
-    <img id="wink-not-detected" src="wink_not_detected.jpg" alt="Wink not detected" hidden>
-    <canvas id="overlay"></canvas>
-
-</body>
+  </head>
+  <body>
+    <h1>Wink Detection</h1>
+    <img
+      id="wink-detected"
+      src="look.jpg"
+      alt="Wink detected"
+      hidden
+    />
+    <img
+      id="wink-not-detected"
+      src="wink_not_detected.jpg"
+      alt="Wink not detected"
+    />
+    <script src="https://unpkg.com/@tensorflow/tfjs@1.7.4"></script>
+    <script src="https://unpkg.com/@mediapipe/control_utils@0.1.162014726"></script>
+    <script src="https://unpkg.com/mediapipe/face_mesh@0.3.162014726"></script>
+    <script src="main.js" type="module"></script>
+  </body>
 </html>
