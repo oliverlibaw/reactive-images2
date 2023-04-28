@@ -1,3 +1,6 @@
+import { FaceMesh } from "@mediapipe/face_mesh/face_mesh";
+import { CONTROL_UTILS } from "@mediapipe/control_utils/control_utils";
+
 (async () => {
   const winkDetectedImage = document.getElementById("wink-detected");
   const winkNotDetectedImage = document.getElementById("wink-not-detected");
@@ -7,20 +10,35 @@
   video.setAttribute("playsinline", "");
   document.body.appendChild(video);
 
-  const faceMesh = new FaceMesh({locateFile: (file) => `https://unpkg.com/mediapipe@0.3.162014726/${file}`});
+  const faceMesh = new FaceMesh({ locateFile: (file) => `https://unpkg.com/mediapipe/face_mesh@0.3.162014726/${file}` });
   await faceMesh.load();
-
+  
+  function euclideanDistance(point1, point2) {
+    const dx = point2[0] - point1[0];
+    const dy = point2[1] - point1[1];
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  
   function isWink(leftEyePoints, rightEyePoints, winkThreshold = 0.6) {
-    const leftEyeHeight = (cv.euclideanDistance(leftEyePoints[1], leftEyePoints[5]) +
-                          cv.euclideanDistance(leftEyePoints[2], leftEyePoints[4])) / 2;
-    const rightEyeHeight = (cv.euclideanDistance(rightEyePoints[1], rightEyePoints[5]) +
-                           cv.euclideanDistance(rightEyePoints[2], rightEyePoints[4])) / 2;
+    const leftEyeHeight =
+      (euclideanDistance(leftEyePoints[1], leftEyePoints[5]) +
+        euclideanDistance(leftEyePoints[2], leftEyePoints[4])) /
+      2;
+    const rightEyeHeight =
+      (euclideanDistance(rightEyePoints[1], rightEyePoints[5]) +
+        euclideanDistance(rightEyePoints[2], rightEyePoints[4])) /
+      2;
 
-    return (leftEyeHeight < winkThreshold * rightEyeHeight || rightEyeHeight < winkThreshold * leftEyeHeight);
+    return (
+      leftEyeHeight < winkThreshold * rightEyeHeight ||
+      rightEyeHeight < winkThreshold * leftEyeHeight
+    );
   }
 
+
+
   async function detectWink() {
-    const faces = await faceMesh.estimateFaces({input: video});
+    const faces = await faceMesh.estimateFaces({ input: video });
 
     let winkDetected = false;
 
@@ -49,8 +67,8 @@
     try {
       const constraints = {
         video: {
-          facingMode: "user"
-        }
+          facingMode: "user",
+        },
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
