@@ -1,26 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wink Detection</title>
-  </head>
-  <body>
-    <h1>Wink Detection</h1>
-    <img
-      id="wink-detected"
-      src="look.jpg"
-      alt="Wink detected"
-      hidden
-    />
-    <img
-      id="wink-not-detected"
-      src="wink_not_detected.jpg"
-      alt="Wink not detected"
-    />
-    <script src="https://unpkg.com/@tensorflow/tfjs@1.7.4"></script>
-    <script src="https://unpkg.com/@mediapipe/control_utils@0.1.162014726"></script>
-    <script src="https://unpkg.com/mediapipe/face_mesh@0.3.162014726"></script>
-    <script src="main.js" type="module"></script>
-  </body>
+    <script defer src="https://unpkg.com/@mediapipe/control_utils/control_utils.js"></script>
+    <script defer src="https://unpkg.com/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script defer src="https://unpkg.com/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script defer src="main.js"></script>
+</head>
+<body>
+    <img id="wink-detected" src="wink_detected.jpg" alt="Wink detected" hidden>
+    <img id="wink-not-detected" src="wink_not_detected.jpg" alt="Wink not detected" hidden>
+    <canvas id="overlay"></canvas>
+</body>
 </html>
