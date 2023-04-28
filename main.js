@@ -96,4 +96,4 @@
   };
 
   await setupCamera();
-})();
+})(); // Remove extra parenthesis here
