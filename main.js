@@ -18,36 +18,35 @@ function calculateEyeAspectRatio(eyePoints) {
 }
 
 async function detectWink() {
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
+  const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
-    let winkDetected = false;
+  let winkDetected = false;
 
-    for (const detection of detections) {
-      const leftEye = detection.landmarks.getLeftEye();
-      const rightEye = detection.landmarks.getRightEye();
-      const leftEyeDistance = calculateEyeDistance(leftEye);
-      const rightEyeDistance = calculateEyeDistance(rightEye);
-      
-      const leftEyeAspectRatio = leftEyeDistance / (leftEye[0]._x - leftEye[3]._x);
-      const rightEyeAspectRatio = rightEyeDistance / (rightEye[0]._x - rightEye[3]._x);
+  for (const detection of detections) {
+    const leftEye = detection.landmarks.getLeftEye();
+    const rightEye = detection.landmarks.getRightEye();
+    const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
+    const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
 
-      const winkThreshold = 0.0001;
-      if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
-        winkDetected = true;
-        break;
-      }
+    const winkThreshold = 0.4;
+    const minEyeAspectRatio = 0.15;
+    if ((leftEyeAspectRatio < minEyeAspectRatio && rightEyeAspectRatio >= minEyeAspectRatio) || (rightEyeAspectRatio < minEyeAspectRatio && leftEyeAspectRatio >= minEyeAspectRatio)) {
+      winkDetected = true;
+      break;
     }
-
-    if (winkDetected) {
-      winkDetectedImage.hidden = false;
-      winkNotDetectedImage.hidden = true;
-    } else {
-      winkDetectedImage.hidden = true;
-      winkNotDetectedImage.hidden = false;
-    }
-
-    requestAnimationFrame(detectWink);
   }
+
+  if (winkDetected) {
+    winkDetectedImage.hidden = false;
+    winkNotDetectedImage.hidden = true;
+  } else {
+    winkDetectedImage.hidden = true;
+    winkNotDetectedImage.hidden = false;
+  }
+
+  requestAnimationFrame(detectWink);
+}
+
 
 
   async function setupCamera() {
