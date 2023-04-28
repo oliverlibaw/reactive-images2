@@ -1,5 +1,3 @@
-import { CONTROL_UTILS } from "@mediapipe/control_utils/control_utils";
-
 (async () => {
   const winkDetectedImage = document.getElementById("wink-detected");
   const winkNotDetectedImage = document.getElementById("wink-not-detected");
