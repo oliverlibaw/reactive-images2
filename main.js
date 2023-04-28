@@ -7,65 +7,42 @@
   video.setAttribute("playsinline", "");
   document.body.appendChild(video);
 
-  const canvas = document.getElementById("overlay");
+  const faceMesh = new FaceMesh({locateFile: (file) => `https://unpkg.com/mediapipe@0.3.162014726/${file}`});
+  await faceMesh.load();
 
-  await faceapi.nets.tinyFaceDetector.loadFromUri("/reactive-images/models");
-  await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/reactive-images/models");
+  function isWink(leftEyePoints, rightEyePoints, winkThreshold = 0.6) {
+    const leftEyeHeight = (cv.euclideanDistance(leftEyePoints[1], leftEyePoints[5]) +
+                          cv.euclideanDistance(leftEyePoints[2], leftEyePoints[4])) / 2;
+    const rightEyeHeight = (cv.euclideanDistance(rightEyePoints[1], rightEyePoints[5]) +
+                           cv.euclideanDistance(rightEyePoints[2], rightEyePoints[4])) / 2;
 
-  function calculateEyeAspectRatio(eyePoints) {
-    const A = faceapi.euclideanDistance(eyePoints[1], eyePoints[5]);
-    const B = faceapi.euclideanDistance(eyePoints[2], eyePoints[4]);
-    const C = faceapi.euclideanDistance(eyePoints[0], eyePoints[3]);
-    return (A + B) / (2 * C);
+    return (leftEyeHeight < winkThreshold * rightEyeHeight || rightEyeHeight < winkThreshold * leftEyeHeight);
   }
 
   async function detectWink() {
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
+    const faces = await faceMesh.estimateFaces({input: video});
 
     let winkDetected = false;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const face of faces) {
+      const leftEyePoints = face.annotations.leftEyeIris;
+      const rightEyePoints = face.annotations.rightEyeIris;
 
-    for (const detection of detections) {
-      const leftEye = detection.landmarks.getLeftEye();
-      const rightEye = detection.landmarks.getRightEye();
-
-      drawEyeKeypoints(ctx, leftEye, "blue");
-      drawEyeKeypoints(ctx, rightEye, "red");
-
-      const leftEyeHeight = (faceapi.euclideanDistance(leftEye[1], leftEye[5]) + faceapi.euclideanDistance(leftEye[2], leftEye[4])) / 2;
-      const rightEyeHeight = (faceapi.euclideanDistance(rightEye[1], rightEye[5]) + faceapi.euclideanDistance(rightEye[2], rightEye[4])) / 2;
-
-      const winkThreshold = 10; // Adjust this value to make the wink detection more or less sensitive
-      if (Math.abs(leftEyeHeight - rightEyeHeight) >= winkThreshold) {
+      if (isWink(leftEyePoints, rightEyePoints)) {
         winkDetected = true;
         break;
       }
     }
 
-  if (winkDetected) {
-    winkDetectedImage.hidden = false;
-    winkNotDetectedImage.hidden = true;
-  } else {
-    winkDetectedImage.hidden = true;
-    winkNotDetectedImage.hidden = false;
-  }
-
-  requestAnimationFrame(detectWink);
-}
-
-
-
-  function drawEyeKeypoints(ctx, eyePoints, color) {
-    ctx.fillStyle = color;
-    for (const point of eyePoints) {
-      ctx.beginPath();
-      ctx.arc(point._x, point._y, 2, 0, 2 * Math.PI);
-      ctx.fill();
+    if (winkDetected) {
+      winkDetectedImage.hidden = false;
+      winkNotDetectedImage.hidden = true;
+    } else {
+      winkDetectedImage.hidden = true;
+      winkNotDetectedImage.hidden = false;
     }
+
+    requestAnimationFrame(detectWink);
   }
 
   async function setupCamera() {
@@ -98,4 +75,4 @@
   };
 
   await setupCamera();
-})(); // Remove extra parenthesis here
+})();
