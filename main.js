@@ -1,4 +1,3 @@
-import { FaceMesh } from "@mediapipe/face_mesh/face_mesh";
 import { CONTROL_UTILS } from "@mediapipe/control_utils/control_utils";
 
 (async () => {
