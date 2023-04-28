@@ -16,7 +16,6 @@ function calculateEyeAspectRatio(eyePoints) {
   const C = faceapi.euclideanDistance(eyePoints[0], eyePoints[3]);
   return (A + B) / (2 * C);
 }
-
 async function detectWink() {
   const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
