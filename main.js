@@ -36,26 +36,28 @@
       drawEyeKeypoints(ctx, leftEye, "blue");
       drawEyeKeypoints(ctx, rightEye, "red");
 
-      const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
-      const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
+      const leftEyeHeight = (faceapi.euclideanDistance(leftEye[1], leftEye[5]) + faceapi.euclideanDistance(leftEye[2], leftEye[4])) / 2;
+      const rightEyeHeight = (faceapi.euclideanDistance(rightEye[1], rightEye[5]) + faceapi.euclideanDistance(rightEye[2], rightEye[4])) / 2;
 
-      const winkThreshold = 0.3;
-      if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
+      const winkThreshold = 10; // Adjust this value to make the wink detection more or less sensitive
+      if (Math.abs(leftEyeHeight - rightEyeHeight) >= winkThreshold) {
         winkDetected = true;
         break;
       }
     }
 
-    if (winkDetected) {
-      winkDetectedImage.hidden = false;
-      winkNotDetectedImage.hidden = true;
-    } else {
-      winkDetectedImage.hidden = true;
-      winkNotDetectedImage.hidden = false;
-    }
-
-    requestAnimationFrame(detectWink);
+  if (winkDetected) {
+    winkDetectedImage.hidden = false;
+    winkNotDetectedImage.hidden = true;
+  } else {
+    winkDetectedImage.hidden = true;
+    winkNotDetectedImage.hidden = false;
   }
+
+  requestAnimationFrame(detectWink);
+}
+
+
 
   function drawEyeKeypoints(ctx, eyePoints, color) {
     ctx.fillStyle = color;
