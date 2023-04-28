@@ -14,8 +14,9 @@ function calculateEyeAspectRatio(eyePoints) {
   const A = faceapi.euclideanDistance(eyePoints[1], eyePoints[5]);
   const B = faceapi.euclideanDistance(eyePoints[2], eyePoints[4]);
   const C = faceapi.euclideanDistance(eyePoints[0], eyePoints[3]);
-  return (A + B) / (2 * C);
+  return (A + B) / (2.0 * C);
 }
+
 async function detectWink() {
   const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
 
@@ -27,13 +28,12 @@ async function detectWink() {
     const leftEyeAspectRatio = calculateEyeAspectRatio(leftEye);
     const rightEyeAspectRatio = calculateEyeAspectRatio(rightEye);
 
-    const winkThreshold = 0.6;
-    const minEyeAspectRatio = 0.05;
-    if ((leftEyeAspectRatio < minEyeAspectRatio && rightEyeAspectRatio >= minEyeAspectRatio) || (rightEyeAspectRatio < minEyeAspectRatio && leftEyeAspectRatio >= minEyeAspectRatio)) {
+    const winkThreshold = 0.25;
+    if (Math.abs(leftEyeAspectRatio - rightEyeAspectRatio) >= winkThreshold) {
       winkDetected = true;
       break;
     }
-  }
+
 
   if (winkDetected) {
     winkDetectedImage.hidden = false;
