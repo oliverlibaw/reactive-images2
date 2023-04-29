@@ -7,7 +7,7 @@ const winkDetectedImage = document.getElementById("wink-detected");
 const winkNotDetectedImage = document.getElementById("wink-not-detected");
 
 (async () => {
-  const faceMeshInstance = new faceMesh.FaceMesh();
+  const faceMeshInstance = new FaceMesh();
 
   async function setupCamera() {
     try {
