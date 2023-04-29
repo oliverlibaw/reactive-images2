@@ -8,8 +8,7 @@
   document.body.appendChild(video);
 
   const faceMesh = new FaceMesh({locateFile: (file) => { return "https://unpkg.com/mediapipe/face_mesh@0.3.162014726/" + file; }});
-  await faceMesh.load();
-  
+
   function euclideanDistance(point1, point2) {
     const dx = point2[0] - point1[0];
     const dy = point2[1] - point1[1];
