@@ -34,20 +34,25 @@
       draw: true,
     });
     
-    // Set up a listener for the `onFrame` event.
-    facemesh.onFrame = () => {
-      // Get the face landmarks.
-      let landmarks = facemesh.getLandmarks();
+    // Set up a listener for the `onPlay` event.
+    video.onPlay = () => {
+      // Add a delay to the `onFrame` event.
+      setTimeout(() => {
+        facemesh.onFrame = () => {
+          // Get the face landmarks.
+          let landmarks = facemesh.getLandmarks();
     
-      // Check if the user has winked.
-      let hasWinked = landmarks.leftEyeClosed && landmarks.rightEyeClosed;
+          // Check if the user has winked.
+          let hasWinked = landmarks.leftEyeClosed && landmarks.rightEyeClosed;
     
-      // If the user has winked, display the `wink-detected.jpg` image.
-      if (hasWinked) {
-        winkImage.src = "wink_detected.jpg";
-      } else {
-        winkImage.src = "look.jpg";
-      }
+          // If the user has winked, display the `wink-detected.jpg` image.
+          if (hasWinked) {
+            winkImage.src = "wink-detected.jpg";
+          } else {
+            winkImage.src = "wink-not-detected.jpg";
+          }
+        };
+      }, 1000);
     };
   </script>
 </body>
