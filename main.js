@@ -1,90 +1,73 @@
-(async () => {
-  const winkDetectedImage = document.getElementById("wink-detected");
-  const winkNotDetectedImage = document.getElementById("wink-not-detected");
+const videoElement = document.createElement('video');
+videoElement.style.display = 'none';
+videoElement.setAttribute('playsinline', '');
+document.body.appendChild(videoElement);
 
-  const video = document.createElement("video");
-  video.style.display = "none";
-  video.setAttribute("playsinline", "");
-  document.body.appendChild(video);
+const winkDetectedImage = document.getElementById("wink-detected");
+const winkNotDetectedImage = document.getElementById("wink-not-detected");
 
-  const faceMesh = new FaceMesh({locateFile: (file) => { return "https://unpkg.com/mediapipe/face_mesh@0.3.162014726/" + file; }});
+async function main() {
+  const camera = new Camera(videoElement, {
+    onFrame: async () => {
+      await detectWink();
+    },
+    width: 640,
+    height: 480,
+  });
+  camera.start();
 
-  function euclideanDistance(point1, point2) {
-    const dx = point2[0] - point1[0];
-    const dy = point2[1] - point1[1];
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-  
-  function isWink(leftEyePoints, rightEyePoints, winkThreshold = 0.6) {
-    const leftEyeHeight =
-      (euclideanDistance(leftEyePoints[1], leftEyePoints[5]) +
-        euclideanDistance(leftEyePoints[2], leftEyePoints[4])) /
-      2;
-    const rightEyeHeight =
-      (euclideanDistance(rightEyePoints[1], rightEyePoints[5]) +
-        euclideanDistance(rightEyePoints[2], rightEyePoints[4])) /
-      2;
+  const faceMesh = new FaceMesh({
+    locateFile: (file) => {
+      return `https://unpkg.com/mediapipe/face_mesh@0.3.162014726/${file}`;
+    },
+  });
 
-    return (
-      leftEyeHeight < winkThreshold * rightEyeHeight ||
-      rightEyeHeight < winkThreshold * leftEyeHeight
-    );
-  }
+  faceMesh.onResults(async (results) => {
+    const face = results.multiFaceLandmarks[0];
 
-  async function detectWink() {
-    const faces = await faceMesh.estimateFaces({ input: video });
-
-    let winkDetected = false;
-
-    for (const face of faces) {
-      const leftEyePoints = face.annotations.leftEyeIris;
-      const rightEyePoints = face.annotations.rightEyeIris;
-
-      if (isWink(leftEyePoints, rightEyePoints)) {
-        winkDetected = true;
-        break;
-      }
+    if (!face) {
+      winkDetectedImage.hidden = true;
+      winkNotDetectedImage.hidden = false;
+      return;
     }
 
-    if (winkDetected) {
+    const leftEyePoints = face.slice(130, 146);
+    const rightEyePoints = face.slice(246, 262);
+
+    if (isWink(leftEyePoints, rightEyePoints)) {
       winkDetectedImage.hidden = false;
       winkNotDetectedImage.hidden = true;
     } else {
       winkDetectedImage.hidden = true;
       winkNotDetectedImage.hidden = false;
     }
+  });
 
-    requestAnimationFrame(detectWink);
+  async function detectWink() {
+    faceMesh.send({ image: videoElement });
   }
+}
 
-  async function setupCamera() {
-    try {
-      const constraints = {
-        video: {
-          facingMode: "user",
-        },
-      };
+function euclideanDistance(point1, point2) {
+  const dx = point2[0] - point1[0];
+  const dy = point2[1] - point1[1];
+  return Math.sqrt(dx * dx + dy * dy);
+}
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      video.srcObject = stream;
-    } catch (error) {
-      console.error("Error setting up camera:", error);
-      alert(
-        "Camera access is required for this app to work. Please enable camera access and reload the page."
-      );
-    }
+function isWink(leftEyePoints, rightEyePoints, winkThreshold = 0.6) {
+  const leftEyeHeight =
+    (euclideanDistance(leftEyePoints[1], leftEyePoints[5]) +
+      euclideanDistance(leftEyePoints[2], leftEyePoints[4])) /
+    2;
+  const rightEyeHeight =
+    (euclideanDistance(rightEyePoints[1], rightEyePoints[5]) +
+      euclideanDistance(rightEyePoints[2], rightEyePoints[4])) /
+    2;
 
-    return new Promise((resolve) => {
-      video.onloadedmetadata = () => {
-        video.play();
-        resolve(video);
-      };
-    });
-  }
+  return (
+    leftEyeHeight < winkThreshold * rightEyeHeight ||
+    rightEyeHeight < winkThreshold * leftEyeHeight
+  );
+}
 
-  video.onplay = () => {
-    detectWink();
-  };
-
-  await setupCamera();
-})();
+main();
