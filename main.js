@@ -6,10 +6,8 @@ document.body.appendChild(videoElement);
 const winkDetectedImage = document.getElementById("wink-detected");
 const winkNotDetectedImage = document.getElementById("wink-not-detected");
 
-async function main() {
-  const { FaceMesh } = await import("@mediapipe/face_mesh/face_mesh");
-
-  const faceMesh = new FaceMesh();
+(async () => {
+  const faceMesh = new faceMesh.FaceMesh();
 
   async function setupCamera() {
     try {
@@ -88,6 +86,4 @@ async function main() {
 
     requestAnimationFrame(detectWink);
   }
-}
-
-main();
+})();
