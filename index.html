@@ -1,22 +1,54 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wink Detection</title>
-    <script defer src="https://unpkg.com/@mediapipe/control_utils/control_utils.js"></script>
-    <script defer src="https://unpkg.com/@mediapipe/drawing_utils/drawing_utils.js"></script>
-    <script defer src="https://unpkg.com/@mediapipe/face_mesh/face_mesh.js"></script>
-    <script src="https://unpkg.com/@mediapipe/face_mesh/face_mesh"></script>
-
-    <script type="module" src="main.js"></script>
-
+  <title>Wink Detection App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mediapipe/0.8.5/mediapipe-full.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    #video {
+      width: 100%;
+      height: 100%;
+    }
+    
+    #wink-image {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-    <img id="wink-detected" src="look.jpg" alt="Wink detected" hidden>
-    <img id="wink-not-detected" src="wink_not_detected.jpg" alt="Wink not detected" hidden>
-    <canvas id="overlay"></canvas>
+  <video id="video"></video>
+  <div id="wink-image"></div>
+  <script>
+    let video = document.getElementById("video");
+    let winkImage = document.getElementById("wink-image");
+    
+    // Initialize the MediaPipe Facemesh object.
+    let facemesh = new mediapipe.Facemesh({
+      input: video,
+      maxNumFaces: 1,
+      draw: true,
+    });
+    
+    // Set up a listener for the `onFrame` event.
+    facemesh.onFrame = () => {
+      // Get the face landmarks.
+      let landmarks = facemesh.getLandmarks();
+    
+      // Check if the user has winked.
+      let hasWinked = landmarks.leftEyeClosed && landmarks.rightEyeClosed;
+    
+      // If the user has winked, display the `wink-detected.jpg` image.
+      if (hasWinked) {
+        winkImage.src = "wink_detected.jpg";
+      } else {
+        winkImage.src = "look.jpg";
+      }
+    };
+  </script>
 </body>
 </html>
