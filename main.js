@@ -7,7 +7,7 @@
   video.setAttribute("playsinline", "");
   document.body.appendChild(video);
 
-  const faceMesh = new FaceMesh({ locateFile: (file) => `https://unpkg.com/mediapipe/face_mesh@0.3.162014726/${file}` });
+  const faceMesh = new FaceMesh({locateFile: (file) => { return "https://unpkg.com/mediapipe/face_mesh@0.3.162014726/" + file; }});
   await faceMesh.load();
   
   function euclideanDistance(point1, point2) {
@@ -31,8 +31,6 @@
       rightEyeHeight < winkThreshold * leftEyeHeight
     );
   }
-
-
 
   async function detectWink() {
     const faces = await faceMesh.estimateFaces({ input: video });
