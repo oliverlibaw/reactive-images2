@@ -8,17 +8,38 @@ const winkNotDetectedImage = document.getElementById("wink-not-detected");
 
 async function main() {
   const { FaceMesh } = await import("@mediapipe/face_mesh/face_mesh");
-  const { Camera } = await import("@mediapipe/camera_utils/camera_utils");
 
   const faceMesh = new FaceMesh();
-  const camera = new Camera(videoElement, {
-    onFrame: async () => {
-      await detectWink();
-    },
-    width: 640,
-    height: 480,
-  });
-  camera.start();
+
+  async function setupCamera() {
+    try {
+      const constraints = {
+        video: {
+          facingMode: 'user',
+        },
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoElement.srcObject = stream;
+    } catch (error) {
+      console.error('Error setting up camera:', error);
+      alert(
+        'Camera access is required for this app to work. Please enable camera access and reload the page.'
+      );
+    }
+
+    return new Promise((resolve) => {
+      videoElement.onloadedmetadata = () => {
+        videoElement.play();
+        resolve(videoElement);
+      };
+    });
+  }
+
+  await setupCamera();
+  videoElement.onplay = () => {
+    detectWink();
+  };
 
   function euclideanDistance(point1, point2) {
     const dx = point2[0] - point1[0];
@@ -64,6 +85,8 @@ async function main() {
       winkDetectedImage.hidden = true;
       winkNotDetectedImage.hidden = false;
     }
+
+    requestAnimationFrame(detectWink);
   }
 }
 
